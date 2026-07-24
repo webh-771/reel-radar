@@ -1,12 +1,14 @@
 name: scrape
 
-# Runs the Instagram scraper and commits data.json back to the repo.
-#   - schedule: every 6 hours (don't go faster — Instagram blocks bursts)
-#   - workflow_dispatch: the "Run workflow" button = your manual "refresh metrics"
-#   - push on links.txt: adding a reel URL auto-triggers a scrape
+# Reads public Instagram reel metrics (likes/comments/caption/owner) with a crawler user-agent —
+# no login, no API key, standard library only. Commits data.json back to the repo.
+#   - schedule: every 6 hours
+#   - workflow_dispatch: the "Run workflow" button = your manual refresh
+#   - push on links.txt: adding a reel auto-triggers a scrape
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    # every 5 min is the GitHub floor; scheduled runs are best-effort and can be delayed under load
+    - cron: "*/5 * * * *"
   workflow_dispatch: {}
   push:
     paths:
@@ -24,29 +26,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - run: pip install instaloader
-
-      # Optional but recommended: log in so Instagram is less likely to block the datacenter IP.
-      # Create the session locally once (`instaloader --login USER`), base64 it, and add two repo
-      # secrets: IG_USERNAME and IG_SESSION (base64 of ~/.config/instaloader/session-USER).
       - name: Scrape
-        env:
-          IG_USERNAME: ${{ secrets.IG_USERNAME }}
-          IG_SESSION: ${{ secrets.IG_SESSION }}
-        run: |
-          if [ -n "$IG_SESSION" ] && [ -n "$IG_USERNAME" ]; then
-            mkdir -p "$HOME/.config/instaloader"
-            echo "$IG_SESSION" | base64 -d > "$HOME/.config/instaloader/session-$IG_USERNAME"
-            python ig_scrape.py --links links.txt --out data.json --login "$IG_USERNAME" || true
-          else
-            echo "::warning::No IG_SESSION secret set — scraping anonymously from a datacenter IP, which Instagram often blocks. See README for the session-secret setup."
-            python ig_scrape.py --links links.txt --out data.json || true
-          fi
+        run: python ig_scrape.py --links links.txt --out data.json
 
       - name: Commit data.json
         run: |
