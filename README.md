@@ -1,75 +1,59 @@
 # Reel Radar
 
-Track Instagram reels/posts — the **actual video** embedded next to its metrics (views, likes,
-comments, engagement) with trend charts. Everything runs on **GitHub Actions**; the dashboard is a
-static page. No local machine, no server to run.
+Track Instagram reels — the **actual video** embedded next to its metrics, with trend charts.
+Everything runs on **GitHub Actions**; the dashboard is a static page. **No login, no API key, no
+cost.**
 
 **Live page:** https://drop.dashverse.ai/reel-radar
 
 ## How it works
 
+Instagram serves its `og:`/`description` meta tags — **likes, comments, caption, owner, date,
+thumbnail** — to crawler user-agents (Googlebot). The scraper fetches each reel URL with that UA
+and parses those tags. No account, no session, standard library only.
+
 ```
- links.txt (the reels you track)                      GitHub Actions (schedule + button)
-        │  edit on GitHub, commit                             │  runs ig_scrape.py (instaloader)
-        └──────────────── push triggers ────────────────────►│  commits data.json back to the repo
-                                                              ▼
-              static page  ◄──── polls raw data.json ──── raw.githubusercontent.com
-              + embeds the real video via Instagram's iframe
+ links.txt (the reels you track)                    GitHub Actions (every 5 min)
+        │  edit on GitHub, commit                          │  ig_scrape.py fetches with a crawler UA
+        └──────────── push triggers ─────────────────────►│  commits data.json back to the repo
+                                                           ▼
+        static page  ◄──── polls raw data.json ──── raw.githubusercontent.com
+        + embeds the real video via Instagram's iframe · auto-updates · "last updated" shown
 ```
 
-You only ever do two things:
+## What you get
 
-- **Add reels** → edit `links.txt` (one URL per line) and commit. The scrape runs automatically.
-- **Refresh metrics** → the page's Refresh button re-pulls the latest data; to force a *new* scrape,
-  run the workflow (Actions → **scrape** → **Run workflow**).
+✅ **likes**, ✅ **comments**, ✅ caption, ✅ owner, ✅ date posted, ✅ thumbnail — tracked over
+time so the dashboard charts trends and ranks reels by engagement.
+
+❌ **view/play count** — Instagram does **not** expose it in the crawler payload. Likes + comments
+only. (Views would require a logged-in session or a paid API, which this deliberately avoids.)
 
 ## Adding reels
 
-Edit [`links.txt`](links.txt) — one Instagram reel/post URL per line:
+Edit [`links.txt`](links.txt) — one Instagram reel/post URL per line — and commit. Committing
+triggers the scrape (`on: push` for `links.txt`); the reel appears on the page within a few minutes.
 
 ```
 https://www.instagram.com/reel/XXXXXXXXXXX/
 https://www.instagram.com/p/XXXXXXXXXXX/
 ```
 
-Committing it triggers the `scrape` workflow (it runs `on: push` for `links.txt`). Give it a
-minute, then hit Refresh on the page.
+## Updating
 
-## Refreshing / scheduling
+The `scrape` workflow (`.github/workflows/scrape.yml`) runs **every 5 minutes** (`schedule`), plus
+on demand (Actions → **Run workflow**) and whenever `links.txt` changes. Each run appends a
+timestamped snapshot per reel, so the charts build a trend.
 
-The `scrape` workflow (`.github/workflows/scrape.yml`) runs:
+> GitHub's cron floor is 5 minutes and scheduled runs are best-effort — under load they can be
+> delayed by several minutes. `raw.githubusercontent.com` also caches for ~5 min. So real-world
+> freshness is roughly **5–15 minutes**, not instant. That's as live as a free, hands-off setup gets.
 
-- **every 6 hours** (`schedule`) — keeps numbers current on their own,
-- **on demand** (`workflow_dispatch`) — the **Run workflow** button = your manual refresh,
-- **on push to `links.txt`** — so adding a reel scrapes it right away.
+Run it locally too if you want:
 
-Each run appends a timestamped snapshot per reel, so the charts build a trend over time.
-
-## ⚠️ Reliability: Instagram blocks datacenter IPs
-
-GitHub's runners use datacenter IPs, which Instagram rate-limits/blocks hard — **anonymous runs
-often come back empty.** To make it reliable, give the workflow a logged-in session:
-
-1. On any machine (once): `pip install instaloader && instaloader --login YOUR_IG_USER`
-   (creates `~/.config/instaloader/session-YOUR_IG_USER`).
-2. Base64 it: `base64 -i ~/.config/instaloader/session-YOUR_IG_USER | pbcopy` (macOS).
-3. In the repo → **Settings → Secrets and variables → Actions**, add:
-   - `IG_USERNAME` = your IG username
-   - `IG_SESSION`  = the base64 blob
-4. The workflow auto-detects the secret and logs in.
-
-Use a burner/secondary Instagram account — a flagged session can get the account challenged.
-Even logged in, keep the cadence slow (the 6-hour default is fine).
-
-If it still gets blocked, the reliable-but-paid path is a 3rd-party scraper API (Apify / RapidAPI):
-swap the `Scrape` step to call that API with a key stored as a secret.
-
-## What data you get
-
-- **Views/plays, comments, caption, owner, timestamp** — usually available.
-- **Likes** — Instagram often hides these; shows `—` when unavailable.
-- Full official insights (reach, saves, plays) exist only for **your own** business/creator media
-  via the Instagram Graph API — not this tool, which targets arbitrary public reels via instaloader.
+```bash
+python3 ig_scrape.py --links links.txt --out data.json     # stdlib only, no pip install
+```
 
 ## Files
 
@@ -77,12 +61,12 @@ swap the `Scrape` step to call that API with a key stored as a secret.
 |---|---|
 | `index.html` | the dashboard (deployed to drop.dashverse) |
 | `sample-data.json` | demo data shown before you add real reels |
-| `ig_scrape.py` | the scraper (instaloader) |
+| `ig_scrape.py` | the scraper (crawler-UA, standard library) |
 | `links.txt` | the reels you track — **edit this to add reels** |
 | `data.json` | scraper output the page reads (committed by the workflow) |
-| `.github/workflows/scrape.yml` | the schedule + Run-workflow button |
+| `.github/workflows/scrape.yml` | the 5-min schedule + Run-workflow button |
 
 ## Legal / ToS
 
-Scraping Instagram violates their Terms of Service. Use for your own analytics, keep the cadence
-slow, and prefer a secondary account for the session. You accept the risk.
+Reading Instagram's public meta tags is far lighter than API scraping, but automated collection
+still runs against Instagram's Terms of Service. Use for your own analytics. You accept the risk.
