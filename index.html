@@ -6,32 +6,27 @@
 <title>Reel Radar — Instagram metrics</title>
 <style>
   :root{
-    --bg:#0b0d12; --panel:#12151d; --panel2:#171b25; --line:#232838;
-    --txt:#e7eaf2; --dim:#98a1b6; --accent:#7c5cff; --accent2:#2dd4bf;
-    --pink:#e1306c; --warn:#f5a524; --ok:#2dd4bf; --bad:#f87171; --like:#7c5cff; --cmt:#2dd4bf; --radius:14px;
+    --bg:#0b0d12;--panel:#12151d;--panel2:#171b25;--panel3:#1c2130;--line:#232838;
+    --txt:#e7eaf2;--dim:#98a1b6;--dim2:#6b7488;--accent:#7c5cff;--accent2:#2dd4bf;
+    --pink:#e1306c;--warn:#f5a524;--ok:#2dd4bf;--bad:#f87171;--like:#7c5cff;--cmt:#2dd4bf;--radius:14px;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
-  body{
-    background:radial-gradient(1200px 600px at 80% -10%, #1a1030 0%, transparent 60%),
-               radial-gradient(1000px 500px at -10% 10%, #06222b 0%, transparent 55%), var(--bg);
-    color:var(--txt); font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif; min-height:100vh;
-  }
+  body{background:radial-gradient(1200px 600px at 80% -10%,#1a1030 0%,transparent 60%),radial-gradient(1000px 500px at -10% 10%,#06222b 0%,transparent 55%),var(--bg);color:var(--txt);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;min-height:100vh;}
   a{color:var(--accent2);}
-  .wrap{max-width:1280px;margin:0 auto;padding:20px 20px 80px;}
+  .wrap{max-width:1300px;margin:0 auto;padding:20px 20px 80px;}
   header.top{display:flex;align-items:center;gap:14px;padding:6px 2px 20px;flex-wrap:wrap;}
   .logo{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,var(--pink),var(--accent));font-size:19px;}
   .title h1{margin:0;font-size:19px;letter-spacing:.2px;}
   .title p{margin:1px 0 0;color:var(--dim);font-size:12px;}
   .top .spacer{flex:1;}
   .btn{background:var(--panel2);color:var(--txt);border:1px solid var(--line);padding:8px 13px;border-radius:10px;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;gap:7px;text-decoration:none;transition:.15s;}
-  .btn:hover{border-color:var(--accent);background:#1c2130;}
+  .btn:hover{border-color:var(--accent);background:var(--panel3);}
   .btn.primary{background:linear-gradient(135deg,var(--accent),#5b3ff0);border:none;color:#fff;}
   .pill{font-size:12px;color:var(--dim);border:1px solid var(--line);border-radius:999px;padding:5px 11px;display:inline-flex;align-items:center;gap:7px;}
   .dot{width:7px;height:7px;border-radius:50%;background:var(--dim);}
   .dot.live{background:var(--ok);box-shadow:0 0 0 3px rgba(45,212,191,.18);}
   .dot.stale{background:var(--warn);}
-
   .banner{background:rgba(124,92,255,.1);border:1px solid rgba(124,92,255,.3);border-radius:12px;padding:11px 14px;font-size:12.5px;margin-bottom:18px;display:flex;gap:10px;align-items:center;}
   .banner b{color:#c9bcff;}
 
@@ -40,44 +35,51 @@
   .kpi .v{font-size:24px;font-weight:650;letter-spacing:.3px;}
   .kpi .l{color:var(--dim);font-size:12px;margin-top:2px;display:flex;align-items:center;gap:6px;}
   .kpi .d{font-size:11px;margin-top:4px;}
-  .up{color:var(--ok);} .down{color:var(--bad);}
+  .up{color:var(--ok);} .down{color:var(--bad);} .flat{color:var(--dim2);}
   .sw{width:9px;height:9px;border-radius:2px;display:inline-block;}
 
-  .section-h{font-size:13px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin:22px 2px 12px;font-weight:600;}
-  .board{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-bottom:8px;}
-  .brow{display:grid;grid-template-columns:150px 1fr auto;gap:12px;align-items:center;padding:7px 0;}
-  .brow + .brow{border-top:1px solid var(--line);}
+  .section-h{display:flex;align-items:center;gap:12px;margin:22px 2px 12px;}
+  .section-h .t{font-size:13px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;font-weight:600;}
+  .seg{display:flex;gap:5px;margin-left:auto;}
+  .seg button{background:var(--panel2);border:1px solid var(--line);color:var(--dim);padding:4px 11px;border-radius:8px;cursor:pointer;font-size:11.5px;}
+  .seg button.on{color:var(--txt);border-color:var(--accent);background:var(--panel3);}
+
+  .board{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 18px;}
+  .brow{display:grid;grid-template-columns:26px 1fr 160px auto;gap:12px;align-items:center;padding:8px 0;}
+  .brow+.brow{border-top:1px solid var(--line);}
+  .brow .rank{color:var(--dim2);font-size:12px;font-weight:600;text-align:center;}
   .brow .who{font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .brow .who b{color:var(--txt);} .brow .who span{color:var(--dim);}
-  .bar{height:20px;border-radius:6px;background:var(--panel2);overflow:hidden;display:flex;}
-  .bar .seg{height:100%;}
-  .brow .tot{font-size:13px;font-weight:600;min-width:64px;text-align:right;}
+  .bar{height:18px;border-radius:6px;background:var(--panel2);overflow:hidden;display:flex;}
+  .bar .s{height:100%;}
+  .brow .tot{font-size:13px;font-weight:650;min-width:58px;text-align:right;}
   .legend{display:flex;gap:14px;font-size:11.5px;color:var(--dim);margin-top:10px;}
   .legend span{display:inline-flex;align-items:center;gap:6px;}
 
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(560px,1fr));gap:18px;}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:grid;grid-template-columns:300px 1fr;min-height:380px;}
-  @media (max-width:640px){.card{grid-template-columns:1fr;}.grid{grid-template-columns:1fr;}.brow{grid-template-columns:110px 1fr auto;}}
-  .embed{background:#000;border-right:1px solid var(--line);}
-  .embed iframe{width:100%;height:100%;min-height:380px;border:0;display:block;background:#000;}
-  .meta{padding:16px;display:flex;flex-direction:column;gap:11px;}
-  .meta .owner{display:flex;align-items:center;gap:8px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(580px,1fr));gap:18px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:grid;grid-template-columns:290px 1fr;}
+  @media (max-width:660px){.card{grid-template-columns:1fr;}.grid{grid-template-columns:1fr;}.brow{grid-template-columns:22px 1fr auto;}.brow .bar{display:none;}}
+  .embed{background:#000;border-right:1px solid var(--line);position:relative;}
+  .embed iframe{width:100%;height:100%;min-height:420px;border:0;display:block;background:#000;}
+  .meta{padding:15px 16px;display:flex;flex-direction:column;gap:11px;}
+  .meta .owner{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
   .meta .owner .u{font-weight:600;}
-  .meta .owner .type,.meta .owner .date{font-size:11px;color:var(--dim);border:1px solid var(--line);padding:2px 8px;border-radius:999px;}
-  .meta .cap{color:var(--dim);font-size:12.5px;max-height:52px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;}
+  .chip{font-size:11px;color:var(--dim);border:1px solid var(--line);padding:2px 8px;border-radius:999px;}
+  .meta .cap{color:var(--dim);font-size:12.5px;max-height:56px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;white-space:pre-wrap;}
+  .tags{display:flex;flex-wrap:wrap;gap:5px;}
+  .tag{font-size:10.5px;color:var(--accent2);background:rgba(45,212,191,.08);border:1px solid rgba(45,212,191,.2);padding:1px 7px;border-radius:6px;}
   .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
   .stat{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 11px;}
   .stat .n{font-size:20px;font-weight:650;}
   .stat .k{color:var(--dim);font-size:11px;display:flex;align-items:center;gap:5px;margin-top:2px;}
   .stat .delta{font-size:10.5px;margin-top:3px;}
-  .chartwrap{margin-top:auto;}
-  .chartwrap .clabel{font-size:11px;color:var(--dim);display:flex;justify-content:space-between;margin-bottom:6px;}
-  svg.spark{width:100%;height:80px;display:block;}
-  .clegend{display:flex;gap:12px;font-size:10.5px;color:var(--dim);margin-top:5px;}
-  .clegend span{display:inline-flex;align-items:center;gap:5px;}
-  .cardfoot{display:flex;gap:10px;align-items:center;font-size:11px;color:var(--dim);}
+  .growth{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:11px 12px;display:flex;flex-direction:column;gap:8px;}
+  .growth .gh{display:flex;justify-content:space-between;font-size:11px;color:var(--dim);}
+  .growth .gr{display:flex;gap:16px;font-size:12.5px;}
+  .growth .gr b{font-weight:650;}
+  svg.spark{width:100%;height:44px;display:block;margin-top:4px;}
+  .cardfoot{display:flex;gap:10px;align-items:center;font-size:11px;color:var(--dim2);}
   .cardfoot a{margin-left:auto;}
-
   .empty{text-align:center;padding:70px 20px;color:var(--dim);}
   .empty h2{color:var(--txt);font-weight:600;margin-bottom:6px;}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;}
@@ -105,11 +107,17 @@
   <section class="kpis" id="kpis"></section>
 
   <div id="boardSection" style="display:none">
-    <div class="section-h">Leaderboard · engagement (likes + comments)</div>
+    <div class="section-h"><span class="t">Leaderboard</span>
+      <div class="seg" id="sortSeg">
+        <button data-k="eng" class="on">Engagement</button>
+        <button data-k="likes">Likes</button>
+        <button data-k="comments">Comments</button>
+      </div>
+    </div>
     <div class="board" id="board"></div>
   </div>
 
-  <div class="section-h" id="reelsH" style="display:none">Reels</div>
+  <div class="section-h" id="reelsH" style="display:none"><span class="t">Reels</span></div>
   <section class="grid" id="grid"></section>
 
   <div class="empty" id="empty" style="display:none">
@@ -135,84 +143,90 @@ const REPO='webh-771/reel-radar';
 const DATA_URL=`https://raw.githubusercontent.com/${REPO}/main/data.json`;
 const EDIT_LINKS=`https://github.com/${REPO}/edit/main/links.txt`;
 const POLL_MS=60*1000;
-let DATA=null, isDemo=false;
+let DATA=null,isDemo=false,sortKey='eng';
 
 const fmt=n=>{if(n==null||isNaN(n))return '—';n=Number(n);
   if(n>=1e9)return (n/1e9).toFixed(1).replace(/\.0$/,'')+'B';
   if(n>=1e6)return (n/1e6).toFixed(1).replace(/\.0$/,'')+'M';
   if(n>=1e3)return (n/1e3).toFixed(1).replace(/\.0$/,'')+'K';return String(n);};
+const signed=n=>(n>0?'+':'')+fmt(Math.abs(n)).replace('-','');
 const ago=iso=>{if(!iso)return 'never';const s=(Date.now()-new Date(iso).getTime())/1000;
   if(isNaN(s))return 'never';if(s<60)return Math.round(s)+'s ago';if(s<3600)return Math.round(s/60)+'m ago';
   if(s<86400)return Math.round(s/3600)+'h ago';return Math.round(s/86400)+'d ago';};
 const dstr=iso=>{if(!iso)return '—';const d=new Date(iso);return isNaN(d)?'—':d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});};
+const ageStr=iso=>{if(!iso)return '';const d=Math.floor((Date.now()-new Date(iso).getTime())/86400000);return isNaN(d)?'':(d<=0?'today':d===1?'1 day old':d+' days old');};
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const posts=()=>(DATA&&DATA.posts)||{};
-const latest=p=>{const h=(p&&p.history)||[];return h.length?h[h.length-1]:{};};
-const eng=cur=>(+(cur.likes||0))+(+(cur.comments||0));
+const H=p=>(p&&p.history)||[];
+const latest=p=>{const h=H(p);return h.length?h[h.length-1]:{};};
+const first=p=>{const h=H(p);return h.length?h[0]:{};};
+const eng=c=>(+(c.likes||0))+(+(c.comments||0));
+const metric=(c,k)=>k==='eng'?eng(c):(+(c[k]||0));
+const hashtags=cap=>{const m=(cap||'').match(/#[\p{L}0-9_]+/gu)||[];return [...new Set(m)].slice(0,10);};
+const capNoTags=cap=>(cap||'').replace(/#[\p{L}0-9_]+/gu,'').replace(/\n[.\s]*\n/g,'\n').trim();
 
-function deltaBadge(series){const v=series.filter(x=>x!=null&&!isNaN(x));if(v.length<2)return '';
-  const d=v[v.length-1]-v[v.length-2];if(!d)return '';return `<div class="delta ${d>0?'up':'down'}">${d>0?'▲':'▼'} ${fmt(Math.abs(d))}</div>`;}
+function growth(p){
+  const h=H(p);if(h.length<2)return null;
+  const a=h[0],b=h[h.length-1];
+  const dl=(+(b.likes||0))-(+(a.likes||0)), dc=(+(b.comments||0))-(+(a.comments||0));
+  const hrs=(new Date(b.t)-new Date(a.t))/3600000;
+  const perDay=hrs>=0.5?{l:dl/hrs*24,c:dc/hrs*24}:null;
+  return {dl,dc,hrs,perDay,since:a.t,snaps:h.length};
+}
+function cls(n){return n>0?'up':n<0?'down':'flat';}
+function arrow(n){return n>0?'▲':n<0?'▼':'▬';}
 
-/* dual-line sparkline: likes + comments, each self-normalized so both trends read */
-function dualSpark(likes,cmts){
-  const L=likes.filter(v=>v!=null&&!isNaN(v)), C=cmts.filter(v=>v!=null&&!isNaN(v));
-  if(Math.max(L.length,C.length)<2)
-    return `<div style="color:var(--dim);font-size:11px;padding:22px 0">Trend builds as snapshots accumulate (every ~5 min).</div>`;
-  const W=100,H=80,pad=6;
-  const line=(vals,color)=>{
-    if(vals.length<2)return '';
-    const mn=Math.min(...vals),mx=Math.max(...vals),rng=(mx-mn)||1;
-    const pts=vals.map((v,i)=>[pad+i*(W-2*pad)/(vals.length-1),H-pad-((v-mn)/rng)*(H-2*pad)]);
-    const d=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
-    const g='g'+Math.random().toString(36).slice(2,7);
-    const area=d+` L ${pts.at(-1)[0].toFixed(1)} ${H} L ${pts[0][0].toFixed(1)} ${H} Z`;
-    return `<defs><linearGradient id="${g}" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${color}" stop-opacity=".28"/><stop offset="1" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>
-      <path d="${area}" fill="url(#${g})"/><path d="${d}" fill="none" stroke="${color}" stroke-width="1.6" vector-effect="non-scaling-stroke"/>`;
+/* Honest line: real y-scale (flat data looks flat). Only shown when there's actual movement
+   over a real time span — otherwise we don't draw a misleading squiggle. */
+function trendChart(p){
+  const h=H(p);if(h.length<3)return '';
+  const spanH=(new Date(h[h.length-1].t)-new Date(h[0].t))/3600000;
+  const L=h.map(s=>+(s.likes||0)), C=h.map(s=>+(s.comments||0));
+  const move=Math.max(Math.max(...L)-Math.min(...L),Math.max(...C)-Math.min(...C));
+  if(spanH<1||move<1)return '';   // not enough real change yet — growth strip covers it
+  const W=100,Hh=44,pad=3;
+  const lo=Math.min(...L,...C),hi=Math.max(...L,...C),rng=(hi-lo)||1;
+  const path=(vals,color)=>{
+    const pts=vals.map((v,i)=>[pad+i*(W-2*pad)/(vals.length-1),Hh-pad-((v-lo)/rng)*(Hh-2*pad)]);
+    return `<path d="${pts.map((q,i)=>(i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' ')}" fill="none" stroke="${color}" stroke-width="1.5" vector-effect="non-scaling-stroke"/>`;
   };
-  return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${line(L,'#7c5cff')}${line(C,'#2dd4bf')}</svg>`;
+  return `<svg class="spark" viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="none">${path(L,'#7c5cff')}${path(C,'#2dd4bf')}</svg>`;
 }
 
 function render(){
-  const P=posts(), keys=Object.keys(P);
-  const dot=document.getElementById('freshDot'), ft=document.getElementById('freshText');
-  const gen=DATA&&DATA.generated_at;
+  const P=posts(),keys=Object.keys(P);
+  const dot=document.getElementById('freshDot'),ft=document.getElementById('freshText'),gen=DATA&&DATA.generated_at;
   if(isDemo){dot.className='dot';ft.textContent='demo data';}
   else if(!gen){dot.className='dot';ft.textContent='no data yet';}
-  else{const stale=(Date.now()-new Date(gen).getTime())/1000>12*60;
-    dot.className='dot '+(stale?'stale':'live');ft.textContent='updated '+ago(gen);}
-
+  else{const stale=(Date.now()-new Date(gen).getTime())/1000>12*60;dot.className='dot '+(stale?'stale':'live');ft.textContent='updated '+ago(gen);}
   document.getElementById('demoBanner').style.display=isDemo?'':'none';
   document.getElementById('empty').style.display=(!keys.length&&!isDemo)?'':'none';
   document.getElementById('boardSection').style.display=keys.length?'':'none';
   document.getElementById('reelsH').style.display=keys.length?'':'none';
-
-  const kpis=document.getElementById('kpis'), grid=document.getElementById('grid'), board=document.getElementById('board');
+  const kpis=document.getElementById('kpis'),grid=document.getElementById('grid'),board=document.getElementById('board');
   if(!keys.length){kpis.innerHTML='';grid.innerHTML='';board.innerHTML='';return;}
 
   let tL=0,tC=0,dL=0,dC=0;
-  keys.forEach(k=>{const h=P[k].history||[],cur=latest(P[k]);
-    tL+=+(cur.likes||0);tC+=+(cur.comments||0);
+  keys.forEach(k=>{const h=H(P[k]),cur=latest(P[k]);tL+=+(cur.likes||0);tC+=+(cur.comments||0);
     if(h.length>1){dL+=(+(h.at(-1).likes||0))-(+(h.at(-2).likes||0));dC+=(+(h.at(-1).comments||0))-(+(h.at(-2).comments||0));}});
   const kpi=(v,l,sw,d)=>`<div class="kpi"><div class="v">${v}</div><div class="l">${sw?`<span class="sw" style="background:${sw}"></span>`:''}${l}</div>${d||''}</div>`;
-  const dl=v=>v?`<div class="d ${v>0?'up':'down'}">${v>0?'▲':'▼'} ${fmt(Math.abs(v))} last cycle</div>`:'';
-  kpis.innerHTML=[
-    kpi(keys.length,'Reels tracked',''),
-    kpi(fmt(tL),'Total likes','var(--like)',dl(dL)),
-    kpi(fmt(tC),'Total comments','var(--cmt)',dl(dC)),
-    kpi(fmt(tL+tC),'Total engagement',''),
-    kpi(fmt(Math.round((tL+tC)/keys.length)),'Avg / reel',''),
-  ].join('');
+  const dl=v=>v?`<div class="d ${cls(v)}">${arrow(v)} ${signed(v)} last cycle</div>`:'';
+  kpis.innerHTML=[kpi(keys.length,'Reels tracked',''),kpi(fmt(tL),'Total likes','var(--like)',dl(dL)),
+    kpi(fmt(tC),'Total comments','var(--cmt)',dl(dC)),kpi(fmt(tL+tC),'Total engagement',''),
+    kpi(fmt(Math.round((tL+tC)/keys.length)),'Avg / reel','')].join('');
 
-  // leaderboard by engagement
-  const ranked=keys.map(k=>({k,p:P[k],cur:latest(P[k])})).sort((a,b)=>eng(b.cur)-eng(a.cur));
-  const maxE=Math.max(1,...ranked.map(r=>eng(r.cur)));
-  board.innerHTML=ranked.map(r=>{
-    const li=+(r.cur.likes||0),cm=+(r.cur.comments||0),e=li+cm;
-    return `<div class="brow">
+  const ranked=keys.map(k=>({k,p:P[k],cur:latest(P[k])})).sort((a,b)=>metric(b.cur,sortKey)-metric(a.cur,sortKey));
+  const maxV=Math.max(1,...ranked.map(r=>metric(r.cur,sortKey)));
+  board.innerHTML=ranked.map((r,i)=>{
+    const li=+(r.cur.likes||0),cm=+(r.cur.comments||0);
+    const val=metric(r.cur,sortKey);
+    const bar=sortKey==='eng'
+      ? `<div class="s" style="width:${(li/maxV*100).toFixed(1)}%;background:var(--like)"></div><div class="s" style="width:${(cm/maxV*100).toFixed(1)}%;background:var(--cmt)"></div>`
+      : `<div class="s" style="width:${(val/maxV*100).toFixed(1)}%;background:${sortKey==='likes'?'var(--like)':'var(--cmt)'}"></div>`;
+    return `<div class="brow"><div class="rank">${i+1}</div>
       <div class="who"><b>@${esc(r.p.owner||'?')}</b> <span>· ${dstr(r.p.taken_at)}</span></div>
-      <div class="bar"><div class="seg" style="width:${(li/maxE*100).toFixed(1)}%;background:var(--like)"></div><div class="seg" style="width:${(cm/maxE*100).toFixed(1)}%;background:var(--cmt)"></div></div>
-      <div class="tot">${fmt(e)}</div></div>`;
-  }).join('')+`<div class="legend"><span><span class="sw" style="background:var(--like)"></span>likes</span><span><span class="sw" style="background:var(--cmt)"></span>comments</span></div>`;
+      <div class="bar">${bar}</div><div class="tot">${fmt(val)}</div></div>`;
+  }).join('')+(sortKey==='eng'?`<div class="legend"><span><span class="sw" style="background:var(--like)"></span>likes</span><span><span class="sw" style="background:var(--cmt)"></span>comments</span></div>`:'');
 
   grid.innerHTML=ranked.map(r=>card(r.k,r.p)).join('');
 }
@@ -220,23 +234,34 @@ function render(){
 function card(code,p){
   const type=p.type||'reel';
   const embed=`https://www.instagram.com/${type==='post'?'p':'reel'}/${code}/embed/captioned/`;
-  const cur=latest(p);
-  const Ls=(p.history||[]).map(s=>s.likes), Cs=(p.history||[]).map(s=>s.comments);
+  const cur=latest(p),h=H(p);
+  const Ls=h.map(s=>s.likes),Cs=h.map(s=>s.comments);
+  const dLike=h.length>1?(+(h.at(-1).likes||0))-(+(h.at(-2).likes||0)):0;
+  const dCmt=h.length>1?(+(h.at(-1).comments||0))-(+(h.at(-2).comments||0)):0;
+  const tags=hashtags(p.caption),capText=capNoTags(p.caption);
+  const g=growth(p),chart=trendChart(p);
+  const growthBlock=`<div class="growth">
+    <div class="gh"><span>Since tracking started${g?` · ${ago(g.since)}`:''}</span><span>${h.length} snapshot${h.length===1?'':'s'}</span></div>
+    ${g?`<div class="gr">
+        <span class="${cls(g.dl)}">${arrow(g.dl)} ${signed(g.dl)} <b>likes</b></span>
+        <span class="${cls(g.dc)}">${arrow(g.dc)} ${signed(g.dc)} <b>comments</b></span>
+        ${g.perDay?`<span style="color:var(--dim2);margin-left:auto">${g.perDay.l>=1||g.perDay.c>=1?`~${fmt(Math.round(g.perDay.l))}♥ ${fmt(Math.round(g.perDay.c))}💬 /day`:'stable'}</span>`:''}
+      </div>`:`<div class="gr" style="color:var(--dim2)">Growth shows once there are 2+ snapshots — building…</div>`}
+    ${chart}
+  </div>`;
+  const delta=(v)=>v?`<div class="delta ${cls(v)}">${arrow(v)} ${signed(v)}</div>`:'';
   return `<div class="card">
     <div class="embed"><iframe src="${embed}" loading="lazy" scrolling="no" allowtransparency="true" allow="encrypted-media"></iframe></div>
     <div class="meta">
-      <div class="owner"><span class="u">@${esc(p.owner||'unknown')}</span><span class="type">${type}</span><span class="date">${dstr(p.taken_at)}</span></div>
-      ${p.caption?`<div class="cap">${esc(p.caption)}</div>`:''}
+      <div class="owner"><span class="u">@${esc(p.owner||'unknown')}</span><span class="chip">${type}</span><span class="chip">${dstr(p.taken_at)}</span>${ageStr(p.taken_at)?`<span class="chip">${ageStr(p.taken_at)}</span>`:''}</div>
+      ${capText?`<div class="cap">${esc(capText)}</div>`:''}
+      ${tags.length?`<div class="tags">${tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>`:''}
       <div class="stats">
-        <div class="stat"><div class="n">${fmt(cur.likes)}</div><div class="k"><span class="sw" style="background:var(--like)"></span>likes</div>${deltaBadge(Ls)}</div>
-        <div class="stat"><div class="n">${fmt(cur.comments)}</div><div class="k"><span class="sw" style="background:var(--cmt)"></span>comments</div>${deltaBadge(Cs)}</div>
+        <div class="stat"><div class="n">${fmt(cur.likes)}</div><div class="k"><span class="sw" style="background:var(--like)"></span>likes</div>${delta(dLike)}</div>
+        <div class="stat"><div class="n">${fmt(cur.comments)}</div><div class="k"><span class="sw" style="background:var(--cmt)"></span>comments</div>${delta(dCmt)}</div>
         <div class="stat"><div class="n">${fmt(eng(cur))}</div><div class="k">engagement</div></div>
       </div>
-      <div class="chartwrap">
-        <div class="clabel"><span>Likes &amp; comments over time</span><span>${(p.history||[]).length} snapshot(s)</span></div>
-        ${dualSpark(Ls,Cs)}
-        <div class="clegend"><span><span class="sw" style="background:var(--like)"></span>likes</span><span><span class="sw" style="background:var(--cmt)"></span>comments</span></div>
-      </div>
+      ${growthBlock}
       <div class="cardfoot"><span>${code}</span><a href="https://www.instagram.com/${type==='post'?'p':'reel'}/${code}/" target="_blank" rel="noopener">Open on Instagram ↗</a></div>
     </div>
   </div>`;
@@ -247,21 +272,17 @@ async function fetchData(){
     const r=await fetch(DATA_URL+'?_='+Math.floor(Date.now()/60000),{cache:'no-store'});
     if(!r.ok)throw new Error('HTTP '+r.status);
     const j=await r.json();
-    if(j&&j.posts&&Object.keys(j.posts).length){DATA=j;isDemo=false;render();}
-    else await loadDemo();
-  }catch(e){ if(!DATA) await loadDemo(); }
+    if(j&&j.posts&&Object.keys(j.posts).length){DATA=j;isDemo=false;render();}else await loadDemo();
+  }catch(e){if(!DATA)await loadDemo();}
 }
-async function loadDemo(){
-  try{const r=await fetch('sample-data.json',{cache:'no-store'});if(r.ok){DATA=await r.json();isDemo=true;render();return;}}catch(e){}
-  DATA={posts:{}};isDemo=false;render();
-}
+async function loadDemo(){try{const r=await fetch('sample-data.json',{cache:'no-store'});if(r.ok){DATA=await r.json();isDemo=true;render();return;}}catch(e){}DATA={posts:{}};isDemo=false;render();}
 function openAdd(){document.getElementById('editLinks').href=EDIT_LINKS;document.getElementById('overlay').classList.add('open');}
 function closeAdd(){document.getElementById('overlay').classList.remove('open');}
 document.getElementById('addBtn').onclick=openAdd;
 document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeAdd();});
+document.querySelectorAll('#sortSeg button').forEach(b=>b.onclick=()=>{sortKey=b.dataset.k;document.querySelectorAll('#sortSeg button').forEach(x=>x.classList.toggle('on',x===b));render();});
 
-fetchData();
-setInterval(fetchData,POLL_MS);
+fetchData();setInterval(fetchData,POLL_MS);
 </script>
 </body>
 </html>
