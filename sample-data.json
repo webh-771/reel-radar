@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-07-24T09:00:00+00:00",
+  "_note": "Demo/sample data with placeholder shortcodes — replace via Settings. Embeds show 'unavailable' for fake codes; add your own real reel URLs to see live video.",
+  "posts": {
+    "DEMOreel001": {
+      "url": "https://www.instagram.com/reel/DEMOreel001/",
+      "shortcode": "DEMOreel001",
+      "type": "reel",
+      "owner": "demo_creator",
+      "caption": "Sample reel — swap this for a real Instagram URL in ⚙ Settings.",
+      "taken_at": "2026-07-18T12:00:00+00:00",
+      "is_video": true,
+      "history": [
+        {"t": "2026-07-19T09:00:00+00:00", "views": 41200, "likes": 3100, "comments": 88},
+        {"t": "2026-07-20T09:00:00+00:00", "views": 88400, "likes": 6900, "comments": 210},
+        {"t": "2026-07-21T09:00:00+00:00", "views": 152000, "likes": 11800, "comments": 402},
+        {"t": "2026-07-22T09:00:00+00:00", "views": 214500, "likes": 16250, "comments": 560},
+        {"t": "2026-07-23T09:00:00+00:00", "views": 268900, "likes": 19900, "comments": 690},
+        {"t": "2026-07-24T09:00:00+00:00", "views": 301400, "likes": 22100, "comments": 742}
+      ]
+    },
+    "DEMOreel002": {
+      "url": "https://www.instagram.com/reel/DEMOreel002/",
+      "shortcode": "DEMOreel002",
+      "type": "reel",
+      "owner": "demo_brand",
+      "caption": "Second sample reel with a slower curve.",
+      "taken_at": "2026-07-20T15:30:00+00:00",
+      "is_video": true,
+      "history": [
+        {"t": "2026-07-21T09:00:00+00:00", "views": 12000, "likes": 640, "comments": 22},
+        {"t": "2026-07-22T09:00:00+00:00", "views": 21800, "likes": 1120, "comments": 41},
+        {"t": "2026-07-23T09:00:00+00:00", "views": 30500, "likes": 1580, "comments": 58},
+        {"t": "2026-07-24T09:00:00+00:00", "views": 36900, "likes": 1910, "comments": 70}
+      ]
+    }
+  }
+}

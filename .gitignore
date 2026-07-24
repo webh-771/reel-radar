@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+.dashverse-session*
+scrape.log

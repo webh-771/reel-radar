@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reel Radar — Instagram metrics</title>
+<style>
+  :root {
+    --bg:#0b0d12; --panel:#12151d; --panel2:#171b25; --line:#232838;
+    --txt:#e7eaf2; --dim:#98a1b6; --accent:#7c5cff; --accent2:#2dd4bf;
+    --pink:#e1306c; --warn:#f5a524; --ok:#2dd4bf; --bad:#f87171; --radius:14px;
+  }
+  * { box-sizing:border-box; }
+  html,body { margin:0; padding:0; }
+  body {
+    background:radial-gradient(1200px 600px at 80% -10%, #1a1030 0%, transparent 60%),
+               radial-gradient(1000px 500px at -10% 10%, #06222b 0%, transparent 55%), var(--bg);
+    color:var(--txt); font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;
+    min-height:100vh;
+  }
+  a { color:var(--accent2); }
+  .wrap { max-width:1280px; margin:0 auto; padding:20px 20px 80px; }
+  header.top { display:flex; align-items:center; gap:14px; padding:6px 2px 20px; flex-wrap:wrap; }
+  .logo { width:36px; height:36px; border-radius:10px; display:grid; place-items:center;
+    background:linear-gradient(135deg,var(--pink),var(--accent)); font-size:19px; }
+  .title h1 { margin:0; font-size:19px; letter-spacing:.2px; }
+  .title p { margin:1px 0 0; color:var(--dim); font-size:12px; }
+  .top .spacer { flex:1; }
+  .btn { background:var(--panel2); color:var(--txt); border:1px solid var(--line);
+    padding:8px 13px; border-radius:10px; cursor:pointer; font-size:13px; display:inline-flex;
+    align-items:center; gap:7px; transition:.15s; text-decoration:none; }
+  .btn:hover { border-color:var(--accent); background:#1c2130; }
+  .btn.primary { background:linear-gradient(135deg,var(--accent),#5b3ff0); border:none; color:#fff; }
+  .btn.spin svg { animation:spin .8s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .pill { font-size:11px; color:var(--dim); border:1px solid var(--line); border-radius:999px; padding:3px 9px; display:inline-flex; align-items:center; gap:6px; }
+  .dot { width:7px; height:7px; border-radius:50%; display:inline-block; background:var(--dim); }
+  .dot.live { background:var(--ok); box-shadow:0 0 0 3px rgba(45,212,191,.18); }
+  .dot.stale { background:var(--warn); }
+
+  .banner { background:rgba(124,92,255,.1); border:1px solid rgba(124,92,255,.3); color:var(--txt);
+    border-radius:12px; padding:11px 14px; font-size:12.5px; margin-bottom:18px; display:flex; gap:10px; align-items:center; }
+  .banner b { color:#c9bcff; }
+
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:22px; }
+  .kpi { background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; }
+  .kpi .v { font-size:24px; font-weight:650; letter-spacing:.3px; }
+  .kpi .l { color:var(--dim); font-size:12px; margin-top:2px; }
+  .kpi .d { font-size:11px; margin-top:4px; color:var(--dim); }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(560px,1fr)); gap:18px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;
+    display:grid; grid-template-columns:320px 1fr; min-height:400px; }
+  @media (max-width:640px){ .card { grid-template-columns:1fr; } .grid{grid-template-columns:1fr;} }
+  .embed { background:#000; border-right:1px solid var(--line); }
+  .embed iframe { width:100%; height:100%; min-height:400px; border:0; display:block; background:#000; }
+  .meta { padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .meta .owner { display:flex; align-items:center; gap:8px; }
+  .meta .owner .u { font-weight:600; }
+  .meta .owner .type { font-size:11px; color:var(--dim); border:1px solid var(--line); padding:2px 8px; border-radius:999px; }
+  .meta .cap { color:var(--dim); font-size:12.5px; max-height:52px; overflow:hidden;
+    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; }
+  .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .stat { background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:10px 11px; }
+  .stat .n { font-size:19px; font-weight:650; }
+  .stat .k { color:var(--dim); font-size:11px; display:flex; align-items:center; gap:5px; margin-top:2px; }
+  .stat .delta { font-size:10.5px; margin-top:3px; }
+  .up { color:var(--ok); } .down { color:var(--bad); }
+  .chartwrap { margin-top:auto; }
+  .chartwrap .clabel { font-size:11px; color:var(--dim); display:flex; justify-content:space-between; margin-bottom:6px; }
+  svg.spark { width:100%; height:72px; display:block; }
+  .cardfoot { display:flex; gap:10px; align-items:center; font-size:11px; color:var(--dim); }
+  .cardfoot a { margin-left:auto; }
+  .note { font-size:11.5px; color:var(--dim); background:rgba(245,165,36,.08); border:1px solid rgba(245,165,36,.25);
+    border-radius:9px; padding:9px 11px; }
+
+  .empty { text-align:center; padding:70px 20px; color:var(--dim); }
+  .empty h2 { color:var(--txt); font-weight:600; margin-bottom:6px; }
+  .mono { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+
+  .overlay { position:fixed; inset:0; background:rgba(4,6,10,.7); backdrop-filter:blur(3px);
+    display:none; align-items:flex-start; justify-content:center; padding:70px 16px; z-index:50; }
+  .overlay.open { display:flex; }
+  .modal { width:min(560px,100%); background:var(--panel); border:1px solid var(--line);
+    border-radius:16px; box-shadow:0 30px 80px rgba(0,0,0,.5); }
+  .modal h3 { margin:0; padding:18px 20px; border-bottom:1px solid var(--line); font-size:16px; }
+  .modal .body { padding:18px 20px; display:flex; flex-direction:column; gap:14px; }
+  .modal .body p { margin:0; color:var(--dim); font-size:13px; }
+  .modal .foot { padding:14px 20px; border-top:1px solid var(--line); display:flex; gap:10px; justify-content:flex-end; }
+  .trlist { display:flex; flex-direction:column; gap:6px; max-height:200px; overflow:auto; }
+  .trrow { display:flex; align-items:center; gap:8px; background:var(--panel2); border:1px solid var(--line);
+    border-radius:9px; padding:7px 10px; font-size:12px; }
+  .trrow code { color:var(--accent2); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="logo">📡</div>
+    <div class="title">
+      <h1>Reel Radar</h1>
+      <p>Instagram reel metrics, alongside the actual video</p>
+    </div>
+    <div class="spacer"></div>
+    <span class="pill"><span class="dot" id="freshDot"></span> <span id="freshText">loading…</span></span>
+    <button class="btn primary" id="refreshBtn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12a9 9 0 1 1-2.64-6.36M21 4v5h-5"/></svg>
+      Refresh metrics
+    </button>
+    <button class="btn" id="addBtn">＋ Add reels</button>
+  </header>
+
+  <div class="banner" id="demoBanner" style="display:none">
+    <span>👀</span><div>Showing <b>demo data</b> — no reels tracked yet. Click <b>＋ Add reels</b> to start tracking your own.</div>
+  </div>
+
+  <section class="kpis" id="kpis"></section>
+  <section class="grid" id="grid"></section>
+  <div class="empty" id="empty" style="display:none">
+    <h2>No reels yet</h2>
+    <p>Click <b>＋ Add reels</b>, paste Instagram reel URLs, and the scraper picks them up automatically.</p>
+    <p style="margin-top:14px"><button class="btn primary" onclick="openAdd()">＋ Add reels</button></p>
+  </div>
+</div>
+
+<!-- Add reels modal -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h3>Add reels</h3>
+    <div class="body">
+      <p>Reels are tracked from a list in your repo (<span class="mono">links.txt</span>). Add one Instagram URL per line and commit — the scraper runs automatically and this page updates on the next refresh.</p>
+      <a class="btn primary" id="editLinks" target="_blank" rel="noopener" style="justify-content:center">Open links.txt on GitHub ↗</a>
+      <p style="font-size:12px">Want fresh numbers right now? <a id="runNow" target="_blank" rel="noopener">Run the scraper on GitHub ↗</a> (Actions → Run workflow), then hit Refresh here.</p>
+      <div id="tracked"></div>
+    </div>
+    <div class="foot">
+      <button class="btn" onclick="closeAdd()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---- config: wired to your GitHub repo ---- */
+const REPO = 'webh-771/reel-radar';
+const DATA_URL   = `https://raw.githubusercontent.com/${REPO}/main/data.json`;
+const EDIT_LINKS = `https://github.com/${REPO}/edit/main/links.txt`;
+const RUN_WF     = `https://github.com/${REPO}/actions/workflows/scrape.yml`;
+const POLL_MS    = 5 * 60 * 1000;
+
+let DATA = null, isDemo = false;
+
+/* ---- helpers ---- */
+function fmt(n){ if(n==null||isNaN(n))return '—'; n=Number(n);
+  if(n>=1e9)return (n/1e9).toFixed(1).replace(/\.0$/,'')+'B';
+  if(n>=1e6)return (n/1e6).toFixed(1).replace(/\.0$/,'')+'M';
+  if(n>=1e3)return (n/1e3).toFixed(1).replace(/\.0$/,'')+'K'; return String(n); }
+function ago(iso){ if(!iso)return 'never'; const s=(Date.now()-new Date(iso).getTime())/1000;
+  if(isNaN(s))return 'never'; if(s<60)return Math.round(s)+'s ago'; if(s<3600)return Math.round(s/60)+'m ago';
+  if(s<86400)return Math.round(s/3600)+'h ago'; return Math.round(s/86400)+'d ago'; }
+function esc(s){ return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function pickViews(s){ return s? (s.views ?? s.video_view_count ?? s.play_count ?? s.plays ?? null) : null; }
+function latest(p){ const h=(p&&p.history)||[]; return h.length?h[h.length-1]:{}; }
+
+function sparkline(series,color){
+  const vals=series.filter(v=>v!=null&&!isNaN(v));
+  if(vals.length<2) return `<div style="color:var(--dim);font-size:11px;padding:18px 0">Trend appears once there are 2+ scrapes.</div>`;
+  const W=100,H=72,pad=4,min=Math.min(...vals),max=Math.max(...vals),rng=(max-min)||1;
+  const pts=vals.map((v,i)=>[pad+i*(W-2*pad)/(vals.length-1), H-pad-((v-min)/rng)*(H-2*pad)]);
+  const d=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const area=d+` L ${pts[pts.length-1][0].toFixed(1)} ${H} L ${pts[0][0].toFixed(1)} ${H} Z`;
+  const g='g'+Math.random().toString(36).slice(2,7);
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    <defs><linearGradient id="${g}" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="${color}" stop-opacity=".35"/><stop offset="1" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>
+    <path d="${area}" fill="url(#${g})"/><path d="${d}" fill="none" stroke="${color}" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`;
+}
+function delta(series){ const v=series.filter(x=>x!=null&&!isNaN(x)); if(v.length<2)return '';
+  const d=v[v.length-1]-v[v.length-2]; if(!d)return '';
+  return `<div class="delta ${d>0?'up':'down'}">${d>0?'▲':'▼'} ${fmt(Math.abs(d))} since last</div>`; }
+
+/* ---- render ---- */
+function posts(){ return (DATA && DATA.posts) || {}; }
+
+function render(){
+  const P=posts(), keys=Object.keys(P);
+  const dot=document.getElementById('freshDot'), ft=document.getElementById('freshText');
+  const gen=DATA&&DATA.generated_at;
+  if(isDemo){ dot.className='dot'; ft.textContent='demo data'; }
+  else if(!gen){ dot.className='dot'; ft.textContent='no data yet'; }
+  else { const stale=(Date.now()-new Date(gen).getTime())/1000>6*3600*1.5;
+    dot.className='dot '+(stale?'stale':'live'); ft.textContent='updated '+ago(gen); }
+
+  document.getElementById('demoBanner').style.display = isDemo ? '' : 'none';
+  document.getElementById('empty').style.display = (!keys.length && !isDemo) ? '' : 'none';
+
+  const kpis=document.getElementById('kpis'), grid=document.getElementById('grid');
+  if(!keys.length){ kpis.innerHTML=''; grid.innerHTML=''; return; }
+
+  let tV=0,tL=0,tC=0,tE=0,n=0;
+  keys.forEach(k=>{ const cur=latest(P[k]); const v=pickViews(cur);
+    if(v)tV+=+v; if(cur.likes)tL+=+cur.likes; if(cur.comments)tC+=+cur.comments;
+    if(v){ tE+=((+(cur.likes||0)+ +(cur.comments||0))/+v)*100; n++; } });
+  kpis.innerHTML=[
+    ['Tracked reels',keys.length,''],['Total views',fmt(tV),''],['Total likes',fmt(tL),''],
+    ['Total comments',fmt(tC),''],['Avg engagement',n?(tE/n).toFixed(2)+'%':'—','likes+comments / views'],
+  ].map(k=>`<div class="kpi"><div class="v">${k[1]}</div><div class="l">${k[0]}</div>${k[2]?`<div class="d">${k[2]}</div>`:''}</div>`).join('');
+
+  grid.innerHTML = keys.map(k=>card(k,P[k])).join('');
+}
+
+function card(code,p){
+  const type=p.type||'reel';
+  const embed=`https://www.instagram.com/${type==='post'?'p':'reel'}/${code}/embed/captioned/`;
+  const cur=latest(p), views=pickViews(cur);
+  const eng=views?(((+(cur.likes||0)+ +(cur.comments||0))/+views)*100).toFixed(2)+'%':'—';
+  const vSeries=(p.history||[]).map(pickViews);
+  return `<div class="card">
+    <div class="embed"><iframe src="${embed}" loading="lazy" scrolling="no" allowtransparency="true" allow="encrypted-media"></iframe></div>
+    <div class="meta">
+      <div class="owner"><span class="u">@${esc(p.owner||'unknown')}</span><span class="type">${type}</span></div>
+      ${p.caption?`<div class="cap">${esc(p.caption)}</div>`:''}
+      <div class="stats">
+        <div class="stat"><div class="n">${fmt(views)}</div><div class="k">▶ views</div>${delta(vSeries)}</div>
+        <div class="stat"><div class="n">${fmt(cur.likes)}</div><div class="k">♥ likes</div>${delta((p.history||[]).map(s=>s.likes))}</div>
+        <div class="stat"><div class="n">${fmt(cur.comments)}</div><div class="k">💬 comments</div>${delta((p.history||[]).map(s=>s.comments))}</div>
+      </div>
+      <div class="stats" style="grid-template-columns:1fr 1fr">
+        <div class="stat"><div class="n">${eng}</div><div class="k">engagement rate</div></div>
+        <div class="stat"><div class="n">${p.taken_at?ago(p.taken_at):'—'}</div><div class="k">posted</div></div>
+      </div>
+      <div class="chartwrap">
+        <div class="clabel"><span>Views over time</span><span>${(p.history||[]).length} snapshot(s)</span></div>
+        ${sparkline(vSeries,'#7c5cff')}
+      </div>
+      <div class="cardfoot"><span>${code}</span><a href="https://www.instagram.com/${type==='post'?'p':'reel'}/${code}/" target="_blank" rel="noopener">Open on Instagram ↗</a></div>
+    </div>
+  </div>`;
+}
+
+/* ---- data ---- */
+async function fetchData(manual){
+  const btn=document.getElementById('refreshBtn');
+  if(manual) btn.classList.add('spin');
+  try{
+    const r=await fetch(DATA_URL,{cache:'no-store'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const j=await r.json();
+    if(j && j.posts && Object.keys(j.posts).length){ DATA=j; isDemo=false; render(); }
+    else { await loadDemo(); }   // repo has no reels yet → show demo preview
+  }catch(e){
+    if(manual) console.warn('fetch failed', e);
+    if(!DATA) await loadDemo();
+  }finally{
+    if(manual) setTimeout(()=>btn.classList.remove('spin'),500);
+  }
+}
+async function loadDemo(){
+  try{ const r=await fetch('sample-data.json',{cache:'no-store'});
+    if(r.ok){ DATA=await r.json(); isDemo=true; render(); return; } }catch(e){}
+  DATA={posts:{}}; isDemo=false; render();
+}
+
+/* ---- add-reels modal ---- */
+function openAdd(){
+  document.getElementById('editLinks').href=EDIT_LINKS;
+  document.getElementById('runNow').href=RUN_WF;
+  const P=posts(), keys=Object.keys(P);
+  document.getElementById('tracked').innerHTML = (!isDemo && keys.length)
+    ? `<p style="margin-top:4px">Currently tracking ${keys.length}:</p><div class="trlist">`+
+      keys.map(k=>`<div class="trrow"><code>${P[k].type||'reel'}/${k}</code><span style="color:var(--dim)">@${esc(P[k].owner||'?')}</span></div>`).join('')+`</div>`
+    : '';
+  document.getElementById('overlay').classList.add('open');
+}
+function closeAdd(){ document.getElementById('overlay').classList.remove('open'); }
+
+/* ---- wire ---- */
+document.getElementById('refreshBtn').onclick=()=>fetchData(true);
+document.getElementById('addBtn').onclick=openAdd;
+document.getElementById('overlay').addEventListener('click',e=>{ if(e.target.id==='overlay') closeAdd(); });
+
+/* ---- boot ---- */
+fetchData(false);
+setInterval(()=>fetchData(false), POLL_MS);
+</script>
+</body>
+</html>
