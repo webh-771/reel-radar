@@ -141,8 +141,11 @@
 <script>
 const REPO='webh-771/reel-radar';
 const DATA_URL=`https://raw.githubusercontent.com/${REPO}/main/data.json`;
+// GitHub API contents endpoint reflects the latest commit near real-time; the raw CDN above caches
+// ~5 min and ignores cache-busters. Poll the API first, fall back to raw. (API: 60 req/hr/IP unauth.)
+const API_URL=`https://api.github.com/repos/${REPO}/contents/data.json`;
 const EDIT_LINKS=`https://github.com/${REPO}/edit/main/links.txt`;
-const POLL_MS=60*1000;
+const POLL_MS=120*1000;
 let DATA=null,isDemo=false,sortKey='eng';
 
 const fmt=n=>{if(n==null||isNaN(n))return '—';n=Number(n);
@@ -267,11 +270,18 @@ function card(code,p){
   </div>`;
 }
 
+async function getData(){
+  try{
+    const r=await fetch(API_URL,{cache:'no-store',headers:{Accept:'application/vnd.github.raw'}});
+    if(r.ok)return await r.json();
+  }catch(e){}
+  const r=await fetch(DATA_URL+'?_='+Date.now(),{cache:'no-store'});
+  if(r.ok)return await r.json();
+  throw new Error('fetch failed');
+}
 async function fetchData(){
   try{
-    const r=await fetch(DATA_URL+'?_='+Math.floor(Date.now()/60000),{cache:'no-store'});
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    const j=await r.json();
+    const j=await getData();
     if(j&&j.posts&&Object.keys(j.posts).length){DATA=j;isDemo=false;render();}else await loadDemo();
   }catch(e){if(!DATA)await loadDemo();}
 }
