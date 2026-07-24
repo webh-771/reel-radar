@@ -1,46 +1,49 @@
 name: scrape
 
-# Reads public Instagram reel metrics (likes/comments/caption/owner) with a crawler user-agent —
-# no login, no API key, standard library only. Commits data.json back to the repo.
-#   - schedule: every 6 hours
-#   - workflow_dispatch: the "Run workflow" button = your manual refresh
-#   - push on links.txt: adding a reel auto-triggers a scrape
+# GitHub's */5 cron is unreliable (often never fires on new repos). Instead ONE run loops
+# internally, scraping every 5 min for ~5.7 h (under the 6 h job limit), then a coarse schedule
+# restarts it. A 6-hourly cron is honored far more reliably than */5, and each run covers ~6 h,
+# so gaps stay small. Public repo => unlimited free Actions minutes, so the long run is free.
 on:
   schedule:
-    # every 5 min is the GitHub floor; scheduled runs are best-effort and can be delayed under load
-    - cron: "*/5 * * * *"
+    - cron: "13 */6 * * *"   # every 6 h at :13 (offset from the congested top-of-hour)
   workflow_dispatch: {}
-  push:
-    paths:
-      - links.txt
 
 permissions:
   contents: write
 
 concurrency:
   group: scrape
-  cancel-in-progress: false
+  cancel-in-progress: false   # a scheduled restart queues behind the running loop -> seamless handoff
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    timeout-minutes: 355
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Scrape
-        run: python ig_scrape.py --links links.txt --out data.json
-
-      - name: Commit data.json
+      - name: Scrape loop (every 5 min)
         run: |
           git config user.name "reel-radar-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data.json
-          if git diff --cached --quiet; then
-            echo "no changes"
-          else
-            git commit -m "chore: refresh metrics [skip ci]"
-            git push
-          fi
+          deadline=$(( $(date +%s) + 5*3600 + 40*60 ))   # stop ~5h40m in, before the 6h job limit
+          n=0
+          while [ "$(date +%s)" -lt "$deadline" ]; do
+            n=$((n+1))
+            echo "── cycle $n ($(date -u +%H:%M:%SZ)) ──"
+            git pull --rebase --autostash -q origin main || true   # pick up links.txt edits mid-run
+            python ig_scrape.py --links links.txt --out data.json || true
+            git add data.json
+            if git diff --cached --quiet; then
+              echo "no change"
+            else
+              git commit -q -m "chore: refresh metrics [skip ci]"
+              git push -q origin HEAD:main || echo "push failed (will retry next cycle)"
+            fi
+            sleep 300
+          done
+          echo "loop done after $n cycles; schedule will restart"
